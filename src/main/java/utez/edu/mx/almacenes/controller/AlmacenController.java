@@ -1,8 +1,7 @@
 package utez.edu.mx.almacenes.controller;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.almacenes.model.Almacen;
 import utez.edu.mx.almacenes.service.AlmacenService;
@@ -11,34 +10,40 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/almacenes")
-@RequiredArgsConstructor
-@Validated
 public class AlmacenController {
 
-    private final AlmacenService almacenService;
+    @Autowired
+    private AlmacenService almacenService;
 
-    @PostMapping
-    public Almacen crear(@Valid @RequestBody Almacen almacen) {
-        return almacenService.createAlmacen(almacen);
-    }
-
-    @GetMapping
+    @GetMapping("/")
     public List<Almacen> listar() {
-        return almacenService.getAllAlmacenes();
+        return almacenService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public Almacen obtenerPorId(@PathVariable Long id) {
-        return almacenService.getAlmacenById(id);
+    public ResponseEntity<Almacen> obtenerPorId(@PathVariable Long id) {
+        return almacenService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/")
+    public Almacen crear(@RequestBody Almacen almacen) {
+        return almacenService.crear(almacen);
     }
 
     @PutMapping("/{id}")
-    public Almacen actualizar(@PathVariable Long id, @Valid @RequestBody Almacen almacen) {
-        return almacenService.updateAlmacen(id, almacen);
+    public ResponseEntity<Almacen> actualizar(@PathVariable Long id, @RequestBody Almacen datos) {
+        try {
+            return ResponseEntity.ok(almacenService.actualizar(id, datos));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        almacenService.deleteAlmacen(id);
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        almacenService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }

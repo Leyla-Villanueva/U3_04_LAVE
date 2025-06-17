@@ -1,9 +1,6 @@
 package utez.edu.mx.almacenes.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,29 +9,69 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Almacen {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String claveAlmacen;
-
+    private String clave;
     private LocalDate fechaRegistro;
-
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio de venta debe ser mayor a 0")
-    private Double precioVenta;
-
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio de renta debe ser mayor a 0")
-    private Double precioRenta;
-
-    @Pattern(regexp = "G|M|P", message = "El tamaño debe ser G, M o P")
-    private String tamaño;
+    private double precioVenta;
+    private double precioRenta;
+    private String tamanio;
 
     @ManyToOne
     @JoinColumn(name = "cede_id")
-    @NotNull(message = "El almacén debe estar asociado a una cede")
-
     private Cede cede;
+
+    // Getters y setters manuales para evitar errores Lombok
+
+    public Long getId() {
+        return this.id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getClave() {
+        return this.clave;
+    }
+    public void setClave(String clave) {
+        this.clave = clave;
+    }
+
+    public LocalDate getFechaRegistro() {
+        return this.fechaRegistro;
+    }
+    public void setFechaRegistro(LocalDate fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
+    public double getPrecioVenta() {
+        return this.precioVenta;
+    }
+    public void setPrecioVenta(double precioVenta) {
+        this.precioVenta = precioVenta;
+    }
+
+    public double getPrecioRenta() {
+        return this.precioRenta;
+    }
+    public void setPrecioRenta(double precioRenta) {
+        this.precioRenta = precioRenta;
+    }
+
+    public String getTamanio() {
+        return this.tamanio;
+    }
+    public void setTamanio(String tamanio) {
+        this.tamanio = tamanio;
+    }
+
+    public Cede getCede() {
+        return this.cede;
+    }
+    public void setCede(Cede cede) {
+        this.cede = cede;
+    }
 }

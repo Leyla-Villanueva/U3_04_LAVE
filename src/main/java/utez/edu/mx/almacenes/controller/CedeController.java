@@ -1,8 +1,7 @@
 package utez.edu.mx.almacenes.controller;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.almacenes.model.Cede;
 import utez.edu.mx.almacenes.service.CedeService;
@@ -11,34 +10,40 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cedes")
-@RequiredArgsConstructor
-@Validated
 public class CedeController {
 
-    private final CedeService cedeService;
+    @Autowired
+    private CedeService cedeService;
 
-    @PostMapping
-    public Cede crear(@Valid @RequestBody Cede cede) {
-        return cedeService.createCede(cede);
-    }
-
-    @GetMapping
+    @GetMapping("/")
     public List<Cede> listar() {
-        return cedeService.getAllCedes();
+        return cedeService.obtenerTodas();
     }
 
     @GetMapping("/{id}")
-    public Cede obtenerPorId(@PathVariable Long id) {
-        return cedeService.getCedeById(id);
+    public ResponseEntity<Cede> obtenerPorId(@PathVariable Long id) {
+        return cedeService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/")
+    public Cede crear(@RequestBody Cede cede) {
+        return cedeService.crear(cede);
     }
 
     @PutMapping("/{id}")
-    public Cede actualizar(@PathVariable Long id, @Valid @RequestBody Cede cede) {
-        return cedeService.updateCede(id, cede);
+    public ResponseEntity<Cede> actualizar(@PathVariable Long id, @RequestBody Cede datos) {
+        try {
+            return ResponseEntity.ok(cedeService.actualizar(id, datos));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        cedeService.deleteCede(id);
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        cedeService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }

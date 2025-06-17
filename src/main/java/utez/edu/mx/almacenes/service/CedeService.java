@@ -1,56 +1,53 @@
 package utez.edu.mx.almacenes.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utez.edu.mx.almacenes.exception.ResourceNotFoundException;
 import utez.edu.mx.almacenes.model.Cede;
 import utez.edu.mx.almacenes.repository.CedeRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
-@RequiredArgsConstructor
 public class CedeService {
 
-    private final CedeRepository cedeRepository;
-    private final Random random = new Random();
+    @Autowired
+    private CedeRepository cedeRepository;
 
-    public Cede createCede(Cede cede) {
-        // Guardar para obtener ID
-        Cede saved = cedeRepository.save(cede);
-
-        // Generar claveCede: C[id]-[ddMMyyyy]-[4 dígitos aleatorios]
-        String fecha = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
-        int aleatorio = 1000 + random.nextInt(9000);
-        String clave = "C" + saved.getId() + "-" + fecha + "-" + aleatorio;
-
-        saved.setClaveCede(clave);
-
-        // Guardar nuevamente con clave generada
-        return cedeRepository.save(saved);
-    }
-
-    public List<Cede> getAllCedes() {
+    public List<Cede> obtenerTodas() {
         return cedeRepository.findAll();
     }
 
-    public Cede getCedeById(Long id) {
+    public Optional<Cede> obtenerPorId(Long id) {
+        return cedeRepository.findById(id);
+    }
+
+    public Cede crear(Cede cede) {
+        Cede nueva = cedeRepository.save(cede);
+        nueva.setClave(generarClave(nueva.getId()));
+        return cedeRepository.save(nueva);
+    }
+
+    public Cede actualizar(Long id, Cede datos) {
         return cedeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cede no encontrada con id: " + id));
+                .map(cede -> {
+                    cede.setEstado(datos.getEstado());
+                    cede.setMunicipio(datos.getMunicipio());
+                    return cedeRepository.save(cede);
+                })
+                .orElseThrow(() -> new RuntimeException("Cede no encontrada"));
     }
 
-    public Cede updateCede(Long id, Cede nuevaCede) {
-        Cede cede = getCedeById(id);
-        cede.setEstado(nuevaCede.getEstado());
-        cede.setMunicipio(nuevaCede.getMunicipio());
-        // claveCede NO se actualiza para mantener integridad
-        return cedeRepository.save(cede);
-    }
-
-    public void deleteCede(Long id) {
+    public void eliminar(Long id) {
         cedeRepository.deleteById(id);
+    }
+
+    private String generarClave(Long id) {
+        String fecha = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        int aleatorio = new Random().nextInt(9000) + 1000;
+        return "C" + id + "-" + fecha + "-" + aleatorio;
     }
 }

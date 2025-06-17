@@ -6,3 +6,4 @@ import utez.edu.mx.almacenes.model.Almacen;
 public interface AlmacenRepository extends JpaRepository<Almacen, Long> {
 }
 
+

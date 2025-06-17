@@ -1,54 +1,60 @@
 package utez.edu.mx.almacenes.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import utez.edu.mx.almacenes.exception.ResourceNotFoundException;
 import utez.edu.mx.almacenes.model.Almacen;
+import utez.edu.mx.almacenes.model.Cede;
 import utez.edu.mx.almacenes.repository.AlmacenRepository;
+import utez.edu.mx.almacenes.repository.CedeRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AlmacenService {
 
-    private final AlmacenRepository almacenRepository;
+    @Autowired
+    private AlmacenRepository almacenRepository;
+    @Autowired
+    private CedeRepository cedeRepository;
 
-    public Almacen createAlmacen(Almacen almacen) {
-
-        almacen.setFechaRegistro(LocalDate.now());
-
-        Almacen saved = almacenRepository.save(almacen);
-
-        String claveAlmacen = saved.getCede().getClaveCede() + "-A" + saved.getId();
-        saved.setClaveAlmacen(claveAlmacen);
-
-        return almacenRepository.save(saved);
-    }
-
-    public List<Almacen> getAllAlmacenes() {
+    public List<Almacen> obtenerTodos() {
         return almacenRepository.findAll();
     }
 
-    public Almacen getAlmacenById(Long id) {
+    public Optional<Almacen> obtenerPorId(Long id) {
+        return almacenRepository.findById(id);
+    }
+
+    public Almacen crear(Almacen almacen) {
+        almacen.setFechaRegistro(LocalDate.now());
+        Cede cedeCompleta = cedeRepository.findById(almacen.getCede().getId())
+                .orElseThrow(() -> new RuntimeException("Cede no encontrada"));
+        almacen.setCede(cedeCompleta);
+        Almacen nuevo = almacenRepository.save(almacen);
+        nuevo.setClave(generarClave(nuevo));
+        return almacenRepository.save(nuevo);
+    }
+
+    public Almacen actualizar(Long id, Almacen datos) {
         return almacenRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Almacen no encontrado con id: " + id));
+                .map(almacen -> {
+                    almacen.setPrecioVenta(datos.getPrecioVenta());
+                    almacen.setPrecioRenta(datos.getPrecioRenta());
+                    almacen.setTamanio(datos.getTamanio());
+                    almacen.setCede(datos.getCede());
+                    return almacenRepository.save(almacen);
+                })
+                .orElseThrow(() -> new RuntimeException("Almacen no encontrado"));
     }
 
-    public Almacen updateAlmacen(Long id, Almacen nuevoAlmacen) {
-        Almacen almacen = getAlmacenById(id);
-        almacen.setPrecioVenta(nuevoAlmacen.getPrecioVenta());
-        almacen.setPrecioRenta(nuevoAlmacen.getPrecioRenta());
-        almacen.setTamaño(nuevoAlmacen.getTamaño());
-        almacen.setCede(nuevoAlmacen.getCede());
-
-        String nuevaClave = almacen.getCede().getClaveCede() + "-A" + almacen.getId();
-        almacen.setClaveAlmacen(nuevaClave);
-        return almacenRepository.save(almacen);
-    }
-
-    public void deleteAlmacen(Long id) {
+    public void eliminar(Long id) {
         almacenRepository.deleteById(id);
+    }
+
+    private String generarClave(Almacen almacen) {
+        String claveCede = almacen.getCede().getClave();
+        return claveCede + "-A" + almacen.getId();
     }
 }
