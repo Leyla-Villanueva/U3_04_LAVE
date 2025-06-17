@@ -1,4 +1,8 @@
 package utez.edu.mx.almacenes.repository;
 
-public class AlmacenRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import utez.edu.mx.almacenes.model.Almacen;
+
+public interface AlmacenRepository extends JpaRepository<Almacen, Long> {
 }
+
