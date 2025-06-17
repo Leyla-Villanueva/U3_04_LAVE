@@ -1,4 +1,7 @@
 package utez.edu.mx.almacenes.repository;
 
-public class ClienteRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import utez.edu.mx.almacenes.model.Cliente;
+
+public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 }
