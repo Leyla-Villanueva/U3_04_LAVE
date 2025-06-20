@@ -1,15 +1,15 @@
 package utez.edu.mx.almacenes.service;
 
-import mx.edu.utez.almacenes.dto.CedeResponseDto;
-import mx.edu.utez.almacenes.dto.AlmacenRequestDto;
-import mx.edu.utez.almacenes.dto.AlmacenResponseDto;
-import mx.edu.utez.almacenes.models.Cede;
-import mx.edu.utez.almacenes.models.Almacen;
-import mx.edu.utez.almacenes.models.AlmacenSize;
-import mx.edu.utez.almacenes.exception.InvalidDataException;
-import mx.edu.utez.almacenes.exception.ResourceNotFoundException;
-import mx.edu.utez.almacenes.repository.CedeRepository;
-import mx.edu.utez.almacenes.repository.AlmacenRepository;
+import utez.edu.mx.almacenes.dto.CedeResponseDto;
+import utez.edu.mx.almacenes.dto.AlmacenRequestDto;
+import utez.edu.mx.almacenes.dto.AlmacenResponseDto;
+import utez.edu.mx.almacenes.model.Cede;
+import utez.edu.mx.almacenes.model.Almacen;
+import utez.edu.mx.almacenes.model.AlmacenSize;
+import utez.edu.mx.almacenes.exception.InvalidDataException;
+import utez.edu.mx.almacenes.exception.ResourceNotFoundException;
+import utez.edu.mx.almacenes.repository.CedeRepository;
+import utez.edu.mx.almacenes.repository.AlmacenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

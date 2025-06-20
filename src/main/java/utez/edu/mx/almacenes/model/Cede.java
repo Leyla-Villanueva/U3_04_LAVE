@@ -3,9 +3,7 @@ package utez.edu.mx.almacenes.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Random;
+
 
 @Entity
 @Table(name = "cedes")

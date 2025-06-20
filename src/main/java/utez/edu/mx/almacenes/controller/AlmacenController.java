@@ -1,9 +1,9 @@
 package utez.edu.mx.almacenes.controller;
 
-import mx.edu.utez.almacenes.dto.AlmacenRequestDto;
-import mx.edu.utez.almacenes.dto.AlmacenResponseDto;
-import mx.edu.utez.almacenes.models.AlmacenSize;
-import mx.edu.utez.almacenes.service.AlmacenService;
+import utez.edu.mx.almacenes.dto.AlmacenRequestDto;
+import utez.edu.mx.almacenes.dto.AlmacenResponseDto;
+import utez.edu.mx.almacenes.model.AlmacenSize;
+import utez.edu.mx.almacenes.service.AlmacenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

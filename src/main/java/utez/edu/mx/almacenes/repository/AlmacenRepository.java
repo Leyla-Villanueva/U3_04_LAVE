@@ -1,8 +1,7 @@
 package utez.edu.mx.almacenes.repository;
 
-
-import mx.edu.utez.almacenes.models.Almacen;
-import mx.edu.utez.almacenes.models.AlmacenSize;
+import utez.edu.mx.almacenes.model.Almacen;
+import utez.edu.mx.almacenes.model.AlmacenSize;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

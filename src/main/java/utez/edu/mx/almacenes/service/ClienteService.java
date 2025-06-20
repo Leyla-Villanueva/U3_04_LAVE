@@ -1,13 +1,13 @@
 package utez.edu.mx.almacenes.service;
 
-import mx.edu.utez.almacenes.dto.AlmacenResponseDto;
-import mx.edu.utez.almacenes.dto.ClienteRequestDto;
-import mx.edu.utez.almacenes.exception.DuplicateResourceException;
-import mx.edu.utez.almacenes.exception.ResourceNotFoundException;
-import mx.edu.utez.almacenes.repository.ClienteRepository;
+import utez.edu.mx.almacenes.dto.AlmacenResponseDto;
+import utez.edu.mx.almacenes.dto.ClienteRequestDto;
+import utez.edu.mx.almacenes.exception.DuplicateResourceException;
+import utez.edu.mx.almacenes.exception.ResourceNotFoundException;
+import utez.edu.mx.almacenes.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
-import mx.edu.utez.almacenes.dto.ClienteResponseDto;
-import mx.edu.utez.almacenes.models.Cliente;
+import utez.edu.mx.almacenes.dto.ClienteResponseDto;
+import utez.edu.mx.almacenes.model.Cliente;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -122,8 +122,8 @@ public class ClienteService {
                 .build();
     }
 
-    private AlmacenResponseDto mapAlmacenToResponseDto(mx.edu.utez.almacenes.models.Almacen almacen) {
-        mx.edu.utez.almacenes.dto.CedeResponseDto cedeDto = mx.edu.utez.almacenes.dto.CedeResponseDto.builder()
+    private AlmacenResponseDto mapAlmacenToResponseDto(utez.edu.mx.almacenes.model.Almacen almacen) {
+        utez.edu.mx.almacenes.dto.CedeResponseDto cedeDto = utez.edu.mx.almacenes.dto.CedeResponseDto.builder()
                 .id(almacen.getCede().getId())
                 .key(almacen.getCede().getClave())
                 .state(almacen.getCede().getEstado())
