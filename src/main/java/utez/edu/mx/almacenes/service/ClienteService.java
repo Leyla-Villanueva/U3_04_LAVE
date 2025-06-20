@@ -1,13 +1,18 @@
 package utez.edu.mx.almacenes.service;
 
-import jakarta.transaction.Transactional;
+import mx.edu.utez.almacenes.dto.AlmacenResponseDto;
+import mx.edu.utez.almacenes.dto.ClienteRequestDto;
+import mx.edu.utez.almacenes.exception.DuplicateResourceException;
+import mx.edu.utez.almacenes.exception.ResourceNotFoundException;
+import mx.edu.utez.almacenes.repository.ClienteRepository;
 import lombok.RequiredArgsConstructor;
+import mx.edu.utez.almacenes.dto.ClienteResponseDto;
+import mx.edu.utez.almacenes.models.Cliente;
 import org.springframework.stereotype.Service;
-import utez.edu.mx.almacenes.model.Cliente;
-import utez.edu.mx.almacenes.repository.ClienteRepository;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor

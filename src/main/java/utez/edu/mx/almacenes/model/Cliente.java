@@ -1,4 +1,5 @@
 package utez.edu.mx.almacenes.model;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
