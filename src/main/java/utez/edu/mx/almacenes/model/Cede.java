@@ -1,54 +1,33 @@
 package utez.edu.mx.almacenes.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 @Entity
-@Data
+@Table(name = "cedes")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Cede {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = true)
     private String clave;
+
+    @NotBlank(message = "State is required")
+    @Column(nullable = false)
     private String estado;
+
+    @NotBlank(message = "City is required")
+    @Column(nullable = false)
     private String municipio;
 
-    // Métodos manuales por si Lombok falla
-    public Long getId() {
-        return this.id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    // Getters y setters para otros campos si no usas Lombok
-
-    public String getClave() {
-        return this.clave;
-    }
-    public void setClave(String clave) {
-        this.clave = clave;
-    }
-
-    public String getEstado() {
-        return this.estado;
-    }
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public String getMunicipio() {
-        return this.municipio;
-    }
-    public void setMunicipio(String municipio) {
-        this.municipio = municipio;
-    }
 }
