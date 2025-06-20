@@ -1,77 +1,65 @@
 package utez.edu.mx.almacenes.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Table(name = "almacenes")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Almacen {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = true)
     private String clave;
-    private LocalDate fechaRegistro;
-    private double precioVenta;
-    private double precioRenta;
-    private String tamanio;
 
-    @ManyToOne
-    @JoinColumn(name = "cede_id")
+    @NotNull(message = "Registration date is required")
+    @Column(nullable = false)
+    private LocalDate fechaRegistro;
+
+    @NotNull(message = "Sale price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Sale price must be greater than 0")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioVenta;
+
+    @NotNull(message = "Rental price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Rental price must be greater than 0")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioRenta;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Size is required")
+    @Column(nullable = false)
+    private AlmacenSize size;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cede_id", nullable = false)
+    @NotNull(message = "Cede is required")
     private Cede cede;
 
-    // Getters y setters manuales para evitar errores Lombok
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean vendido = false;
 
-    public Long getId() {
-        return this.id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean rentado = false;
 
-    public String getClave() {
-        return this.clave;
-    }
-    public void setClave(String clave) {
-        this.clave = clave;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = true)
+    private Cliente cliente;
 
-    public LocalDate getFechaRegistro() {
-        return this.fechaRegistro;
-    }
-    public void setFechaRegistro(LocalDate fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
-    }
-
-    public double getPrecioVenta() {
-        return this.precioVenta;
-    }
-    public void setPrecioVenta(double precioVenta) {
-        this.precioVenta = precioVenta;
-    }
-
-    public double getPrecioRenta() {
-        return this.precioRenta;
-    }
-    public void setPrecioRenta(double precioRenta) {
-        this.precioRenta = precioRenta;
-    }
-
-    public String getTamanio() {
-        return this.tamanio;
-    }
-    public void setTamanio(String tamanio) {
-        this.tamanio = tamanio;
-    }
-
-    public Cede getCede() {
-        return this.cede;
-    }
-    public void setCede(Cede cede) {
-        this.cede = cede;
+    public boolean isDisponible() {
+        return !vendido && !rentado;
     }
 }
