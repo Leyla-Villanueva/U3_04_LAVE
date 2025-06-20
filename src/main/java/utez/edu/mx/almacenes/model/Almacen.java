@@ -3,13 +3,15 @@ package utez.edu.mx.almacenes.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Data
+@Table(name = "almacenes")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,22 +21,46 @@ public class Almacen {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String claveAlmacen;
+    @Column(unique = true, nullable = true)
+    private String clave;
 
+    @NotNull(message = "Registration date is required")
+    @Column(nullable = false)
     private LocalDate fechaRegistro;
 
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio de venta debe ser mayor a 0")
-    private Double precioVenta;
+    @NotNull(message = "Sale price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Sale price must be greater than 0")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioVenta;
 
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio de renta debe ser mayor a 0")
-    private Double precioRenta;
+    @NotNull(message = "Rental price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Rental price must be greater than 0")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioRenta;
 
-    @Pattern(regexp = "G|M|P", message = "El tamaño debe ser G, M o P")
-    private String tamaño;
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Size is required")
+    @Column(nullable = false)
+    private AlmacenSize size;
 
-    @ManyToOne
-    @JoinColumn(name = "cede_id")
-    @NotNull(message = "El almacén debe estar asociado a una cede")
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cede_id", nullable = false)
+    @NotNull(message = "Cede is required")
     private Cede cede;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean vendido = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean rentado = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = true)
+    private Cliente cliente;
+
+    public boolean isDisponible() {
+        return !vendido && !rentado;
+    }
 }
