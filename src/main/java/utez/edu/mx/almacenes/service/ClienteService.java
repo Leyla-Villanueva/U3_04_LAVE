@@ -1,41 +1,45 @@
 package utez.edu.mx.almacenes.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import utez.edu.mx.almacenes.exception.ResourceNotFoundException;
 import utez.edu.mx.almacenes.model.Cliente;
 import utez.edu.mx.almacenes.repository.ClienteRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ClienteService {
 
-    private final ClienteRepository clienteRepository;
+    @Autowired
+    private ClienteRepository clienteRepository;
 
-    public Cliente createCliente(Cliente cliente) {
-        return clienteRepository.save(cliente);
-    }
-
-    public List<Cliente> getAllClientes() {
+    public List<Cliente> obtenerTodos() {
         return clienteRepository.findAll();
     }
 
-    public Cliente getClienteById(Long id) {
-        return clienteRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + id));
+    public Optional<Cliente> obtenerPorId(Long id) {
+        return clienteRepository.findById(id);
     }
 
-    public Cliente updateCliente(Long id, Cliente nuevoCliente) {
-        Cliente cliente = getClienteById(id);
-        cliente.setNombreCompleto(nuevoCliente.getNombreCompleto());
-        cliente.setTelefono(nuevoCliente.getTelefono());
-        cliente.setCorreoElectronico(nuevoCliente.getCorreoElectronico());
+    public Cliente crear(Cliente cliente) {
         return clienteRepository.save(cliente);
     }
 
-    public void deleteCliente(Long id) {
+    public Cliente actualizar(Long id, Cliente datos) {
+        return clienteRepository.findById(id)
+                .map(cliente -> {
+                    cliente.setNombreCompleto(datos.getNombreCompleto());
+                    cliente.setTelefono(datos.getTelefono());
+                    cliente.setCorreoElectronico(datos.getCorreoElectronico());
+                    return clienteRepository.save(cliente);
+                })
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    }
+
+    public void eliminar(Long id) {
         clienteRepository.deleteById(id);
     }
 }

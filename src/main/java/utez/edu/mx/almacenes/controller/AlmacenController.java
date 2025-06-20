@@ -1,19 +1,19 @@
 package utez.edu.mx.almacenes.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import mx.edu.utez.almacenes.dto.AlmacenRequestDto;
+import mx.edu.utez.almacenes.dto.AlmacenResponseDto;
+import mx.edu.utez.almacenes.models.AlmacenSize;
+import mx.edu.utez.almacenes.service.AlmacenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import utez.edu.mx.almacenes.dto.AlmacenRequestDto;
-import utez.edu.mx.almacenes.dto.AlmacenResponseDto;
-import utez.edu.mx.almacenes.model.AlmacenSize;
-import utez.edu.mx.almacenes.service.AlmacenService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -22,8 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @CrossOrigin(origins = "*", maxAge = 3600)
-
 public class AlmacenController {
+
     private final AlmacenService warehouseService;
 
     @PostMapping

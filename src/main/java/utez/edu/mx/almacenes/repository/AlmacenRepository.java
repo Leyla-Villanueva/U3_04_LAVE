@@ -1,12 +1,12 @@
 package utez.edu.mx.almacenes.repository;
 
+
+import mx.edu.utez.almacenes.models.Almacen;
+import mx.edu.utez.almacenes.models.AlmacenSize;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import utez.edu.mx.almacenes.model.Almacen;
-import utez.edu.mx.almacenes.model.AlmacenSize;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,7 +27,7 @@ public interface AlmacenRepository extends JpaRepository<Almacen, Long> {
 
     @Query("SELECT w FROM Almacen w WHERE w.precioRenta BETWEEN :minPrice AND :maxPrice")
     List<Almacen> findByPrecioRentaBetween(@Param("minPrice") BigDecimal minPrice,
-                                           @Param("maxPrice") BigDecimal maxPrice);
+                                             @Param("maxPrice") BigDecimal maxPrice);
 
     List<Almacen> findByFechaRegistroAfter(LocalDate date);
 
@@ -54,3 +54,4 @@ public interface AlmacenRepository extends JpaRepository<Almacen, Long> {
     @Query("SELECT COUNT(a) FROM Almacen a WHERE a.vendido = false AND a.rentado = false")
     Long countDisponibles();
 }
+

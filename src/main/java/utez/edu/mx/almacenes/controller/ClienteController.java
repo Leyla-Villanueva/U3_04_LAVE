@@ -1,8 +1,7 @@
 package utez.edu.mx.almacenes.controller;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import utez.edu.mx.almacenes.model.Cliente;
 import utez.edu.mx.almacenes.service.ClienteService;
@@ -11,35 +10,40 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/clientes")
-@RequiredArgsConstructor
-@Validated
-
 public class ClienteController {
 
-    private final ClienteService clienteService;
+    @Autowired
+    private ClienteService clienteService;
 
-    @PostMapping
-    public Cliente crear(@Valid @RequestBody Cliente cliente) {
-        return clienteService.createCliente(cliente);
-    }
-
-    @GetMapping
+    @GetMapping("/")
     public List<Cliente> listar() {
-        return clienteService.getAllClientes();
+        return clienteService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public Cliente obtenerPorId(@PathVariable Long id) {
-        return clienteService.getClienteById(id);
+    public ResponseEntity<Cliente> obtenerPorId(@PathVariable Long id) {
+        return clienteService.obtenerPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/")
+    public Cliente crear(@RequestBody Cliente cliente) {
+        return clienteService.crear(cliente);
     }
 
     @PutMapping("/{id}")
-    public Cliente actualizar(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
-        return clienteService.updateCliente(id, cliente);
+    public ResponseEntity<Cliente> actualizar(@PathVariable Long id, @RequestBody Cliente datos) {
+        try {
+            return ResponseEntity.ok(clienteService.actualizar(id, datos));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        clienteService.deleteCliente(id);
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        clienteService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
