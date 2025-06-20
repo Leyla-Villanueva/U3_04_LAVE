@@ -1,28 +1,30 @@
 package utez.edu.mx.almacenes.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
-@Data
+@Table(name = "cedes")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Cede {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String claveCede; // Se genera automáticamente
+    @Column(unique = true, nullable = true)
+    private String clave;
 
-    @NotBlank(message = "El estado no debe estar vacío")
+    @NotBlank(message = "State is required")
+    @Column(nullable = false)
     private String estado;
 
-    @NotBlank(message = "El municipio no debe estar vacío")
+    @NotBlank(message = "City is required")
+    @Column(nullable = false)
     private String municipio;
+
 }

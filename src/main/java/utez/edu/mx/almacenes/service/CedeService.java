@@ -1,7 +1,9 @@
 package utez.edu.mx.almacenes.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import utez.edu.mx.almacenes.dto.CedeResponseDto;
 import utez.edu.mx.almacenes.exception.ResourceNotFoundException;
 import utez.edu.mx.almacenes.model.Cede;
 import utez.edu.mx.almacenes.repository.CedeRepository;
@@ -10,47 +12,109 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CedeService {
 
     private final CedeRepository cedeRepository;
-    private final Random random = new Random();
 
-    public Cede createCede(Cede cede) {
-        // Guardar para obtener ID
-        Cede saved = cedeRepository.save(cede);
 
-        // Generar claveCede: C[id]-[ddMMyyyy]-[4 dígitos aleatorios]
-        String fecha = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
-        int aleatorio = 1000 + random.nextInt(9000);
-        String clave = "C" + saved.getId() + "-" + fecha + "-" + aleatorio;
+    public CedeResponseDto createCede(CedeRequestDto request) {
+        if (cedeRepository.existsByEstadoAndMunicipio(request.getState(), request.getCity())) {
+            throw new DuplicateResourceException("Cede", "state and city",
+                    request.getState() + ", " + request.getCity());
+        }
 
-        saved.setClaveCede(clave);
+        Cede cede = Cede.builder()
+                .estado(request.getState().trim())
+                .municipio(request.getCity().trim())
+                .build();
 
-        // Guardar nuevamente con clave generada
-        return cedeRepository.save(saved);
+        Cede savedCede = cedeRepository.save(cede);
+
+        String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+        String randomDigits = String.format("%04d", new Random().nextInt(10000));
+        savedCede.setClave(String.format("C%d-%s-%s", savedCede.getId(), dateStr, randomDigits));
+
+        savedCede = cedeRepository.save(savedCede);
+
+        return mapToResponseDTO(savedCede);
     }
 
-    public List<Cede> getAllCedes() {
-        return cedeRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<CedeResponseDto> getAllCedes() {
+        return cedeRepository.findAll()
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public Cede getCedeById(Long id) {
-        return cedeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cede no encontrada con id: " + id));
+    @Transactional(readOnly = true)
+    public CedeResponseDto getCedeById(Long id) {
+        Cede cede = cedeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cede", "id", id));
+        return mapToResponseDTO(cede);
     }
 
-    public Cede updateCede(Long id, Cede nuevaCede) {
-        Cede cede = getCedeById(id);
-        cede.setEstado(nuevaCede.getEstado());
-        cede.setMunicipio(nuevaCede.getMunicipio());
-        // claveCede NO se actualiza para mantener integridad
-        return cedeRepository.save(cede);
+    @Transactional(readOnly = true)
+    public CedeResponseDto getCedeByKey(String key) {
+        Cede cede = cedeRepository.findByClave(key)
+                .orElseThrow(() -> new ResourceNotFoundException("Cede", "key", key));
+        return mapToResponseDTO(cede);
+    }
+
+    public CedeResponseDto updateCede(Long id, CedeRequestDto request) {
+        Cede existingCede = cedeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cede", "id", id));
+
+        // Check for duplicate if state or city changed
+        if (!existingCede.getEstado().equals(request.getState()) ||
+                !existingCede.getMunicipio().equals(request.getCity())) {
+            if (cedeRepository.existsByEstadoAndMunicipio(request.getState(), request.getCity())) {
+                throw new DuplicateResourceException("Cede", "state and city",
+                        request.getState() + ", " + request.getCity());
+            }
+        }
+
+        existingCede.setEstado(request.getState().trim());
+        existingCede.setMunicipio(request.getCity().trim());
+
+        Cede updatedCede = cedeRepository.save(existingCede);
+        return mapToResponseDTO(updatedCede);
     }
 
     public void deleteCede(Long id) {
+        if (!cedeRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Cede", "id", id);
+        }
         cedeRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CedeResponseDto> searchCedesByState(String state) {
+        return cedeRepository.findByEstadoContainingIgnoreCase(state)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CedeResponseDto> searchCedesByCity(String city) {
+        return cedeRepository.findByMunicipioContainingIgnoreCase(city)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    private CedeResponseDto mapToResponseDTO(Cede cede) {
+        return CedeResponseDto.builder()
+                .id(cede.getId())
+                .key(cede.getClave())
+                .state(cede.getEstado())
+                .city(cede.getMunicipio())
+                .build();
     }
 }
